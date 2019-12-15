@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset='utf-8' />
+	<title>Heatwave Mitigation Facilities</title>
+	<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+	<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.0/mapbox-gl.js'></script>
+	<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.0/mapbox-gl.css' rel='stylesheet' />
+	<style>
+		div.a {
+			text-align:center; 
+			padding-top:20px; 
+			background-color:#000000;
+			height:60px;
+			font: 20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+			float: left;
+			width:100%;
+		}
+		div.b {
+			text-align:center; 
+			padding-top:20px; 
+			background-color:#000000;
+			height:60px;
+			font: 20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+			float: right;
+			width:100%;
+			margin-block-end: 10em
+		}
+
+
+		
+		body {
+			margin: 0;
+			padding: 0;
+		}
+		
+		h2 {
+			margin-block-end: 0em;
+		}
+
+		h4{
+			margin-block-start: 0em;
+			margin-block-end: 0em;
+
+		}
+
+		h5{
+			font: 15px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+			line-height: 1.6;
+		}
+
+
+		#map {
+			position: absolute;
+			top: 160px;
+			bottom: 0;
+			width: 100%;
+		}
+
+		/* Popup style */
+
+		.mapboxgl-map {
+			font: 15px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+			overflow: hidden;
+			position: relative;
+			-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+			text-align: left;
+		}
+		
+		.mapboxgl-popup {
+			padding-bottom: 50px;
+			padding:10px;
+		}
+
+		.mapboxgl-popup-content {
+			font:400 15px/22px;
+			padding:0;
+			width:300px;
+		}  
+
+		.mapboxgl-popup-content-wrapper {
+			padding:1%;
+		}
+
+		.mapboxgl-popup-content h3 {
+			background:#000000;
+			color:#fff;
+			margin:10;
+			display:block;
+			padding:10px;
+			border-radius:3px 3px 0 0;
+			font-weight:700;
+			margin-top:-15px;
+		}
+
+		.mapboxgl-popup-content h4 {
+			margin:0;
+			font:15px ! important;
+			display:block;
+			padding: 10px 10px 10px 10px;
+			font-weight:400;
+		}
+
+
+
+		.mapboxgl-popup-close-button {
+			color: white;
+		}
+
+		.mapboxgl-popup-tip{
+			margin-bottom: 15px;
+		}
+
+		.mapboxgl-popup-anchor-top {
+			overflow: visible;
+			top:15px;
+		}
+
+		.mapboxgl-popup-anchor-top .mapboxgl-popup-tip{
+			border-bottom-color:black;
+
+		}
+
+		/* Popup style Ends*/
+
+		/* Menu */
+		#menu {
+			background: #000000;
+			position: absolute;
+			z-index: 1;
+			bottom: 10px;
+			left: 20px;
+			border-radius: 3px;
+			width: 200px;
+			border: 2px solid rgba(255,255,255,0.4);
+			font-family: 'Open Sans', sans-serif;
+		}
+
+		#menu a {
+			font-size: 15px;
+			color: #fff;
+			display: block;
+			margin: 0;
+			padding: 0;
+			padding: 10px;
+			text-decoration: none;
+			border-bottom: 1px solid rgba(255,255,255,0.4);
+			text-align: center;
+		}
+
+		.text {
+			padding-top:10px; 
+			padding-bottom:10px; 
+			color: white;
+			background-color: black;
+			text-align: center;
+
+		}
+
+		#menu a:last-child {
+			border: none;
+		}
+
+		#menu a:hover {
+			background-color: #615f5f;
+			color: #fff;
+		}
+
+		#menu a.active {
+			background-color: #fff;
+			color: #000;
+		}
+
+		#menu a.active:hover {
+			background:#a3a0a0;
+			color:#fff;
+		}
+		
+		/* The Modal (background) */
+		.button {
+			background-color: #4CAF50;
+			border: none;
+			color: white;
+			padding: 15px 32px;
+			text-align: center;
+			text-decoration: none;
+			display: inline-block;
+			font-size: 16px;
+			margin: 4px 2px;
+			cursor: pointer;
+		}
+		.modal {
+			display: none; /* Hidden by default */
+			position: fixed; /* Stay in place */
+			z-index: 1; /* Sit on top */
+			padding-top: 100px; /* Location of the box */
+			left: 0;
+			top: 0;
+			width: 100%; /* Full width */
+			height: 100%; /* Full height */
+			overflow: auto; /* Enable scroll if needed */
+			background-color: rgb(0,0,0); /* Fallback color */
+			background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+		}
+
+		/* Modal Content */
+		.modal-content {
+			background-color: #fefefe;
+			margin: auto;
+			padding: 20px;
+			border: 1px solid #888;
+			width: 50%;
+		}
+
+		/* The Close Button */
+		.close {
+			color: #aaaaaa;
+			float: right;
+			font-size: 28px;
+			font-weight: bold;
+		}
+
+		.close:hover,
+		.close:focus {
+			color: #000;
+			text-decoration: none;
+			cursor: pointer;
+		}
+
+	</style>
+</head>
+<body>
+	<div class="a">
+		<h2 style="color:white;"> Montreal Heatwave Mitigation Facilities Map <br><br> </h2>
+		<!-- <h2 style="font-size:20px;">  Click on the icon to see detailed information of the facilities </h2> -->
+		<!-- Trigger/Open The Modal -->
+	</div>
+	<div class="b">
+		<button id="myBtn1" class="button"> Click here to see Description and Instructions</button>
+	</div>
+<!-- 	<div id="myModal" class="modal">
+		<div class="modal-content">
+			<span class="close">&times;</span>
+			<h5>Welcome to the interactive map of Montreal heatwave migitation facilities. In the event of extreme heat, this map will help you locate cooling centers and spaces for public use. This map contains an inventory of the cooling spaces in the area of Rosemont La Petite-Patrie that are available during an extreme heat event. These spaces are listed under the feature section. A printed copy of Hours of Operations and Addresses is provided upon request. In case of any emergency, please call 911.
+			<p> You can double click on the feature menu to turn on or off different layers. The panel on the top right will help you find you current location and naviagte the map.</p>
+			</h5>
+		</div>
+	</div> -->
+	<div id="myModal1" class="modal">
+		<!-- Modal content -->
+		<div class="modal-content">
+			<span class="close">&times;</span>
+			<h5>
+			<b>Description</b>
+			<br>Welcome to the interactive map of Montreal heatwave migitation facilities. In the event of extreme heat, this map will help you locate cooling centers and spaces for public use. This map contains an inventory of the cooling spaces in the area of Rosemont La Petite-Patrie that are available during an extreme heat event. These spaces are listed under the feature section. A printed copy of Hours of Operations and Addresses is provided upon request. In case of any emergency, please call 911.
+			<br>
+			<br>
+			<b>Instructions</b>
+			<br>
+			You can double click the tabs in the Features menu to turn on or off different layers. The panel on the top right will help you find you current location and naviagte the map.</p>
+			</h5>
+		</div>
+	</div>
+	
+	<div id='map'></div>
+	<nav id="menu"></nav>
+
+	<script>
+// Map begins here
+mapboxgl.accessToken = 'pk.eyJ1IjoiZXN0ZWxsYTIxMzQzOSIsImEiOiJjanJ1eTRndHgzMDY2M3lsYXMwaHVqNGVuIn0.-NQ2jPS_wCAxQ2bCVbsabA'; 
+var map = new mapboxgl.Map({
+	container: 'map',
+      style: 'mapbox://styles/estella213439/ck3rg3ep90ehs1cpapyd48cpv', // replace this with your style URL
+      center: [-73.5836, 45.5517],
+      zoom: 12
+  });
+
+//Map ends here
+
+//alert("Welcome to Montreal Heat Mitigation Map. You can click on the icons to view detailed information about the facilities or choose to turn on/off certain facility layers.s");
+
+//Menu begins here
+
+var toggleableLayerIds = ['Features', 'Fountains', 'Libraries','Pools','Hospitals', 'Community-centers','Homeless-shelters','Fire-stations','Police-stations','Parks', 'Boundary' ];
+
+for (var i = 0; i < toggleableLayerIds.length; i++) {
+	var id = toggleableLayerIds[i];
+	
+	
+
+	if (i == 0){
+		var link = document.createElement('h4');
+		link.className = 'text';
+		link.textContent = id;
+	}
+
+	if (i > 0) {
+
+		var link = document.createElement('a');
+		link.textContent = id;
+		link.href = '##';
+		link.className = 'active';
+	
+	link.onclick = function (e) {
+		var clickedLayer = this.textContent;
+		e.preventDefault();
+		e.stopPropagation();
+
+		var visibility = map.getLayoutProperty(clickedLayer, 'visibility');
+
+		if (visibility === 'visible') {
+			map.setLayoutProperty(clickedLayer, 'visibility', 'none');
+			this.className = '';
+		} else {
+			this.className = 'active';
+			map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
+		}
+	};
+
+}
+
+var layers = document.getElementById('menu');
+layers.appendChild(link);
+}
+
+//Menu ends here
+
+//Popup starts here
+//Fountain popup
+
+map.on('click', 'Fountains', function (e) {
+	var coordinates = e.features[0].geometry.coordinates.slice();
+	var Intersection = e.features[0].properties.Intersection;
+
+// Ensure that if the map is zoomed out such that multiple
+// copies of the feature are visible, the popup appears
+// over the copy being pointed to.
+while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+	coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+}
+
+new mapboxgl.Popup()
+.setLngLat(coordinates)
+.setHTML('<h3> Water Fountain </h3>' + '<h4> <b>Intersection: </b> <br>' + Intersection +'</h4>')
+.addTo(map);
+});
+
+//Popup amenities
+var popupLayers = [ 'Libraries','Pools','Hospitals','Community-centers','Homeless-shelters','Fire-stations','Police-stations'];
+
+for (var i = 0; i < popupLayers.length; i++) {
+
+	map.on('click', popupLayers[i] , function (e) {
+		var coordinates = e.features[0].geometry.coordinates.slice();
+		var address = e.features[0].properties.address;
+		var hours = e.features[0].properties.hours;
+		var name = e.features[0].properties.name;
+		var call = e.features[0].properties.phone;
+
+// Ensure that if the map is zoomed out such that multiple
+// copies of the feature are visible, the popup appears
+// over the copy being pointed to.
+while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+	coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+}
+
+new mapboxgl.Popup()
+.setLngLat(coordinates)
+.setHTML('<h3>' + name + '</h3>' + '<h4>  <b> Address: </b> <br>' + address + ' <p> <b> Hours of Operation : </b> <br>' + hours + '</p>' + '<b> Phone: </b> <br>' + call + '</p> </h4>')
+.addTo(map);
+})
+};
+
+//Park Popups
+map.on('click', 'Parks', function (e) {
+	var coordinates = e.features[0].geometry.coordinates.slice();
+	var Intersection = e.features[0].properties.Intersection;
+
+	while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+		coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+	}
+
+	new mapboxgl.Popup()
+	.setLngLat(coordinates)
+	.setHTML('<h3> Park </h3>' + '<h4>  <b> Name: </b> <br>' + name)
+	.addTo(map);
+});
+
+// Locate User
+map.addControl(new mapboxgl.GeolocateControl({
+	positionOptions: {
+		enableHighAccuracy: true
+	},
+	trackUserLocation: true
+}));
+
+map.addControl(new mapboxgl.NavigationControl());
+
+//Locate user ends here
+
+// Change the cursor to a pointer when the mouse is over the places layer.
+var Layers = [ 'Fountains','Libraries','Pools','Hospitals','Community-centers','Homeless-shelters','Fire-stations','Police-stations'];
+
+for (var i = 0; i < popupLayers.length; i++) {
+	map.on('mouseenter', Layers[i], function () {
+		map.getCanvas().style.cursor = 'pointer';
+	});
+	map.on('mouseleave', Layers[i], function () {
+		map.getCanvas().style.cursor = '';
+	});
+
+}
+
+// Instruction
+// var modal = document.getElementById("myModal");
+// var btn = document.getElementById("myBtn");
+// var span = document.getElementsByClassName("close")[0];
+// btn.onclick = function() {
+// 	modal.style.display = "block";
+// }
+// span.onclick = function() {
+// 	modal.style.display = "none";
+// }
+
+
+// Description
+var modal1 = document.getElementById("myModal1");
+var btn1 = document.getElementById("myBtn1");
+var span1 = document.getElementsByClassName("close")[0];
+btn1.onclick = function() {
+	modal1.style.display = "block";
+}
+span1.onclick = function() {
+	modal1.style.display = "none";
+}
+window.onclick = function(event) {
+	if (event.target == modal1) {
+		modal1.style.display = "none";
+	}
+}
+
+</script>
+</body>
+</html>
